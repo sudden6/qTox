@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Format all C++ codebase tracked by git using `clang-format`.
+# Format all C++ codebase tracked by git or specific files using `clang-format`.
 
 # Requires:
 #   * git
@@ -23,7 +23,9 @@
 
 # usage:
 #   ./$script
+#   ./$script ./path/to/FILE1 ./to/FILE2 ...
 
+readonly FILES="$*"
 
 # Fail as soon as error appears
 set -eu -o pipefail
@@ -37,6 +39,11 @@ format() {
     [[ -f .clang-format ]] # make sure that it exists
     # NOTE: some earlier than 3.8 versions of clang-format are broken
     # and will not work correctly
-    clang-format -i -style=file $(git ls-files *.cpp *.h)
+    if [ -n "$FILES" ]
+    then
+        clang-format -i -style=file "$FILES"
+    else
+        clang-format -i -style=file $(git ls-files *.cpp *.h)
+    fi
 }
 format
